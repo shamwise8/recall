@@ -184,15 +184,29 @@ for (const group of SYNONYM_GROUPS) {
   }
 }
 
+function norm(s: string): string {
+  return s.trim().toLowerCase().replace(/^to\s+/, "");
+}
+
+function checkMatch(typed: string, correct: string): boolean {
+  if (typed === correct) return true;
+  const synonyms = lookupMap.get(correct);
+  if (synonyms && synonyms.has(typed)) return true;
+  const typedSynonyms = lookupMap.get(typed);
+  if (typedSynonyms && typedSynonyms.has(correct)) return true;
+  return false;
+}
+
 export function isAnswerCorrect(typed: string, correct: string): boolean {
-  const t = typed.trim().toLowerCase().replace(/^to\s+/, "");
-  const c = correct.trim().toLowerCase().replace(/^to\s+/, "");
-  if (t === c) return true;
-  // Check if typed is a known synonym of the correct answer
-  const synonyms = lookupMap.get(c);
-  if (synonyms && synonyms.has(t)) return true;
-  // Also check reverse — maybe typed is a canonical and correct is a variant
-  const typedSynonyms = lookupMap.get(t);
-  if (typedSynonyms && typedSynonyms.has(c)) return true;
+  const t = norm(typed);
+  const c = norm(correct);
+  if (checkMatch(t, c)) return true;
+  // If correct answer has "/" or "(" alternatives, accept any part
+  // e.g. "sorry / excuse me" → accept "sorry" or "excuse me"
+  // e.g. "yes (male polite)" → accept "yes"
+  const parts = c.split(/\s*[\/]\s*|\s*\(.*?\)\s*/).map(p => norm(p)).filter(p => p.length > 0);
+  for (const part of parts) {
+    if (checkMatch(t, part)) return true;
+  }
   return false;
 }
