@@ -51,7 +51,7 @@ export default function Recall() {
 
   const handleStartReview = async () => { const due = await getDueWords(pack, 20); if (due.length === 0) return; setDueWords(due); setScreen("review"); };
   const handleComplete = async (results: ReviewResult[]) => { setSessionResults(results); await refreshStats(pack); setScreen("complete"); };
-  const handlePostScore = (name: string, accuracy: number, wordsReviewed: number, correct: number, feeling: string) => { postScore(name, accuracy, wordsReviewed, correct, feeling, pack); };
+  const handlePostScore = async (name: string, accuracy: number, wordsReviewed: number, correct: number, feeling: string) => { await postScore(name, accuracy, wordsReviewed, correct, feeling, pack); };
   const handleHome = async () => { await refreshStats(pack); await refreshDue(pack); setScreen("home"); };
 
   if (screen === "loading") {

@@ -16,8 +16,11 @@ export default function LeaderboardScreen({ onBack }: LeaderboardScreenProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setEntries(loadLeaderboard());
-    setLoading(false);
+    (async () => {
+      setLoading(true);
+      setEntries(await loadLeaderboard());
+      setLoading(false);
+    })();
   }, []);
 
   const weekKey = getWeekKey();

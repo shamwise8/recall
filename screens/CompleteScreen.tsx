@@ -10,7 +10,7 @@ interface CompleteScreenProps {
   results: ReviewResult[];
   stats: Stats;
   onHome: () => void;
-  onPostScore: (name: string, accuracy: number, wordsReviewed: number, correct: number, feeling: string) => void;
+  onPostScore: (name: string, accuracy: number, wordsReviewed: number, correct: number, feeling: string) => Promise<void>;
   onLeaderboard: () => void;
 }
 
@@ -34,10 +34,10 @@ export default function CompleteScreen({ results, stats, onHome, onPostScore, on
   else if (pct >= 40) message = "Practice makes perfect.";
   else message = "Every session counts.";
 
-  const handlePost = () => {
+  const handlePost = async () => {
     if (!name.trim() || posting || gradedTotal === 0) return;
     setPosting(true);
-    onPostScore(name.trim(), pct, gradedTotal, correct, feeling);
+    await onPostScore(name.trim(), pct, gradedTotal, correct, feeling);
     setPosted(true);
     setPosting(false);
   };

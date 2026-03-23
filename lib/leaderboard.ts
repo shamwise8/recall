@@ -16,27 +16,33 @@ export function getWeekKey(): string {
   return `${now.getFullYear()}-W${String(weekNum).padStart(2, "0")}`;
 }
 
-export function loadLeaderboard(): LeaderboardEntry[] {
+export async function loadLeaderboard(): Promise<LeaderboardEntry[]> {
   try {
-    const raw = localStorage.getItem("leaderboard-scores");
-    return raw ? JSON.parse(raw) : [];
+    const res = await fetch("/api/leaderboard");
+    if (!res.ok) return [];
+    return await res.json();
   } catch {
     return [];
   }
 }
 
-export function saveLeaderboard(entries: LeaderboardEntry[]): void {
+export async function postScore(name: string, accuracy: number, wordsReviewed: number, correct: number, feeling?: string, pack?: string): Promise<void> {
   try {
-    localStorage.setItem("leaderboard-scores", JSON.stringify(entries));
+    await fetch("/api/leaderboard", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: name.trim(),
+        accuracy,
+        wordsReviewed,
+        correct,
+        feeling,
+        pack,
+        timestamp: Date.now(),
+        week: getWeekKey(),
+      }),
+    });
   } catch (err) {
-    console.error(err);
+    console.error("Failed to post score:", err);
   }
-}
-
-export function postScore(name: string, accuracy: number, wordsReviewed: number, correct: number, feeling?: string, pack?: string): LeaderboardEntry[] {
-  const entries = loadLeaderboard();
-  entries.push({ name: name.trim(), accuracy, wordsReviewed, correct, feeling, pack, timestamp: Date.now(), week: getWeekKey() });
-  const trimmed = entries.slice(-500);
-  saveLeaderboard(trimmed);
-  return trimmed;
 }
