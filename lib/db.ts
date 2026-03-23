@@ -42,12 +42,13 @@ export async function getAllWords(pack: string): Promise<Word[]> {
 
 export async function getDueWords(pack: string, limit = 20): Promise<Word[]> {
   const all = await getAllWords(pack);
-  const due = all.filter(w => w.due <= Date.now()).sort((a, b) => a.due - b.due).slice(0, limit);
+  const due = all.filter(w => w.due <= Date.now());
+  // Shuffle first, then slice — prevents alphabetical bias when all due times are equal
   for (let i = due.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [due[i], due[j]] = [due[j], due[i]];
   }
-  return due;
+  return due.slice(0, limit);
 }
 
 export async function putWord(word: Word): Promise<void> {
