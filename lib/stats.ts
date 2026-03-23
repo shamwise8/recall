@@ -1,5 +1,6 @@
 import { getAllWords } from "./db";
 import { loadLeaderboard } from "./leaderboard";
+import type { LeaderboardEntry } from "./leaderboard";
 
 export interface Stats {
   total: number;
@@ -7,6 +8,24 @@ export interface Stats {
   learned: number;
   reviewedToday: number;
   streak: number;
+}
+
+// Cache leaderboard data — fetch once, reuse across pack switches
+let cachedEntries: LeaderboardEntry[] | null = null;
+let cacheTime = 0;
+const CACHE_TTL = 60_000; // 1 minute
+
+async function getCachedLeaderboard(): Promise<LeaderboardEntry[]> {
+  if (cachedEntries && Date.now() - cacheTime < CACHE_TTL) return cachedEntries;
+  cachedEntries = await loadLeaderboard();
+  cacheTime = Date.now();
+  return cachedEntries;
+}
+
+// Call this after posting a score to bust the cache
+export function invalidateStatsCache() {
+  cachedEntries = null;
+  cacheTime = 0;
 }
 
 export async function getStats(pack: string): Promise<Stats> {
@@ -26,13 +45,12 @@ export async function getStats(pack: string): Promise<Stats> {
     else break;
   }
 
-  // TODAY + LEARNED from Redis leaderboard (cross-device)
+  // TODAY + LEARNED from cached Redis leaderboard (cross-device)
   let reviewedToday = 0;
   let learned = 0;
   try {
-    const entries = await loadLeaderboard();
-    const packFlag = pack === "th" ? "🇹🇭" : "🇪🇸";
-    const packEntries = entries.filter(e => !e.pack || e.pack === pack || e.pack === packFlag);
+    const entries = await getCachedLeaderboard();
+    const packEntries = entries.filter(e => !e.pack || e.pack === pack);
     for (const e of packEntries) {
       if (e.timestamp >= todayMs) {
         reviewedToday += e.wordsReviewed || 0;
@@ -40,7 +58,6 @@ export async function getStats(pack: string): Promise<Stats> {
       learned += e.correct || 0;
     }
   } catch {
-    // Fall back to local stats if Redis is unavailable
     reviewedToday = all.filter(w => w.lastReviewed && w.lastReviewed >= todayMs).length;
     learned = all.filter(w => w.reps >= 2).length;
   }

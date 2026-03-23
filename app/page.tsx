@@ -5,6 +5,7 @@ import { C, FONT, FONT_SERIF } from "@/styles/theme";
 import { getDueWords, seedWords } from "@/lib/db";
 import { getStats } from "@/lib/stats";
 import { postScore } from "@/lib/leaderboard";
+import { invalidateStatsCache } from "@/lib/stats";
 import type { Stats } from "@/lib/stats";
 import type { Word } from "@/lib/srs";
 import type { ReviewResult } from "@/screens/ReviewScreen";
@@ -51,7 +52,7 @@ export default function Recall() {
 
   const handleStartReview = async () => { const due = await getDueWords(pack, 20); if (due.length === 0) return; setDueWords(due); setScreen("review"); };
   const handleComplete = async (results: ReviewResult[]) => { setSessionResults(results); await refreshStats(pack); setScreen("complete"); };
-  const handlePostScore = async (name: string, accuracy: number, wordsReviewed: number, correct: number, feeling: string) => { await postScore(name, accuracy, wordsReviewed, correct, feeling, pack); };
+  const handlePostScore = async (name: string, accuracy: number, wordsReviewed: number, correct: number, feeling: string) => { await postScore(name, accuracy, wordsReviewed, correct, feeling, pack); invalidateStatsCache(); };
   const handleHome = async () => { await refreshStats(pack); await refreshDue(pack); setScreen("home"); };
 
   if (screen === "loading") {
