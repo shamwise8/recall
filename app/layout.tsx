@@ -8,8 +8,22 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Recall",
-  description: "Spanish vocabulary trainer with spaced repetition",
+  title: "Recall — Spanish Vocabulary",
+  description: "Learn Spanish with spaced repetition flashcards. Type your answers, track your streak, compete on the leaderboard.",
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
+  openGraph: {
+    title: "Recall — Spanish Vocabulary",
+    description: "Learn Spanish with spaced repetition flashcards.",
+    images: ["/og.svg"],
+  },
+  other: {
+    "theme-color": "#2C2418",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
