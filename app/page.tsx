@@ -56,20 +56,26 @@ export default function Recall() {
 
   if (screen === "loading") {
     return (
-      <div style={{ minHeight: "100vh", background: C.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT_SERIF }}>
+      <div style={{ minHeight: "100vh", background: C.dark, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT_SERIF }}>
         <div style={{ textAlign: "center", color: C.ink3 }}>
-          <div style={{ fontSize: 20, fontStyle: "italic" }}>Recall</div>
+          <div style={{ fontSize: 20, fontStyle: "italic", color: C.muted }}>Recall</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: C.bg, fontFamily: FONT, WebkitFontSmoothing: "antialiased" }}>
-      {screen === "home" && <HomeScreen stats={stats} pack={pack} onSwitchPack={handleSwitchPack} onStartReview={handleStartReview} onLeaderboard={() => setScreen("leaderboard")} />}
-      {screen === "review" && <ReviewScreen words={dueWords} pack={pack} onComplete={handleComplete} />}
-      {screen === "complete" && <CompleteScreen results={sessionResults} stats={stats} onHome={handleHome} onPostScore={handlePostScore} onLeaderboard={() => setScreen("leaderboard")} />}
-      {screen === "leaderboard" && <LeaderboardScreen onBack={handleHome} />}
+    <div style={{ minHeight: "100vh", background: C.dark, fontFamily: FONT, WebkitFontSmoothing: "antialiased", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div className="phone-frame" style={{
+        width: "100%", maxWidth: 430, minHeight: "100vh", background: C.bg,
+        boxShadow: "0 0 80px rgba(0,0,0,0.3)",
+        position: "relative", overflow: "auto",
+      }}>
+        {screen === "home" && <HomeScreen stats={stats} pack={pack} onSwitchPack={handleSwitchPack} onStartReview={handleStartReview} onLeaderboard={() => setScreen("leaderboard")} />}
+        {screen === "review" && <ReviewScreen words={dueWords} pack={pack} onComplete={handleComplete} />}
+        {screen === "complete" && <CompleteScreen results={sessionResults} stats={stats} onHome={handleHome} onPostScore={handlePostScore} onLeaderboard={() => setScreen("leaderboard")} />}
+        {screen === "leaderboard" && <LeaderboardScreen onBack={handleHome} />}
+      </div>
     </div>
   );
 }
