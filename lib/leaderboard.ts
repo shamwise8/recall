@@ -4,6 +4,7 @@ export interface LeaderboardEntry {
   wordsReviewed: number;
   correct: number;
   feeling?: string;
+  pack?: string;
   timestamp: number;
   week: string;
 }
@@ -32,9 +33,9 @@ export function saveLeaderboard(entries: LeaderboardEntry[]): void {
   }
 }
 
-export function postScore(name: string, accuracy: number, wordsReviewed: number, correct: number, feeling?: string): LeaderboardEntry[] {
+export function postScore(name: string, accuracy: number, wordsReviewed: number, correct: number, feeling?: string, pack?: string): LeaderboardEntry[] {
   const entries = loadLeaderboard();
-  entries.push({ name: name.trim(), accuracy, wordsReviewed, correct, feeling, timestamp: Date.now(), week: getWeekKey() });
+  entries.push({ name: name.trim(), accuracy, wordsReviewed, correct, feeling, pack, timestamp: Date.now(), week: getWeekKey() });
   const trimmed = entries.slice(-500);
   saveLeaderboard(trimmed);
   return trimmed;

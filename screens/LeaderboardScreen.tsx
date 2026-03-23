@@ -69,7 +69,7 @@ export default function LeaderboardScreen({ onBack }: LeaderboardScreenProps) {
                     transform: isFirst ? "translateY(-6px)" : "none",
                   }}>
                     <div style={{ fontSize: isFirst ? 24 : 18 }}>{MEDAL[pi]}</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: C.ink, marginTop: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.name}</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: C.ink, marginTop: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.pack === "th" ? "🇹🇭" : e.pack === "es" ? "🇪🇸" : ""} {e.name}</div>
                     <div style={{ fontSize: isFirst ? 20 : 16, fontWeight: 400, fontFamily: FONT_SERIF, marginTop: 2, color: e.accuracy === 100 ? C.good : e.accuracy >= 80 ? C.info : C.amber }}>{e.accuracy}%</div>
                     <div style={{ fontSize: 9, color: C.muted }}>{e.correct}/{e.wordsReviewed}</div>
                   </div>

@@ -4,6 +4,7 @@ import { C, FONT_SERIF } from "@/styles/theme";
 import type { LeaderboardEntry } from "@/lib/leaderboard";
 
 const MEDAL = ["🥇", "🥈", "🥉"];
+const PACK_FLAG: Record<string, string> = { es: "🇪🇸", th: "🇹🇭" };
 
 export { MEDAL };
 
@@ -22,7 +23,10 @@ export default function LeaderboardRow({ entry, rank }: { entry: LeaderboardEntr
         {isMedal ? MEDAL[rank - 1] : rank}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: C.ink, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{entry.name}</div>
+        <div style={{ fontSize: 14, fontWeight: 600, color: C.ink, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 5 }}>
+          {entry.pack && <span style={{ fontSize: 12 }}>{PACK_FLAG[entry.pack] || ""}</span>}
+          {entry.name}
+        </div>
         <div style={{ fontSize: 11, color: C.muted }}>{entry.correct}/{entry.wordsReviewed} words</div>
       </div>
       <div style={{
