@@ -29,18 +29,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={dmSans.className} style={{ margin: 0, background: C.dark }}>
+      <body className={dmSans.className} style={{ margin: 0, background: C.bg }}>
         <style>{`
           * { box-sizing: border-box; margin: 0; padding: 0; }
-          body { background: ${C.dark}; }
-          @media (min-width: 500px) {
-            .phone-frame {
-              border-radius: 32px !important;
-              min-height: calc(100vh - 40px) !important;
-              margin: 20px auto !important;
-              border: 3px solid ${C.darkSoft} !important;
-            }
-          }
+          body { background: ${C.bg}; }
           input:focus { border-color: ${C.accent} !important; box-shadow: 0 0 0 3px ${C.accentBg} !important; }
           input::placeholder { color: ${C.muted} !important; opacity: 1 !important; -webkit-text-fill-color: ${C.muted} !important; }
           input[type="text"] { color: #2C2418 !important; -webkit-text-fill-color: #2C2418 !important; caret-color: #2C2418 !important; opacity: 1 !important; font-size: 14px !important; }
