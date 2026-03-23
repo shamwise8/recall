@@ -126,6 +126,9 @@ const SYNONYM_GROUPS: string[][] = [
   ["police", "cops", "officer"],
   ["market", "bazaar"],
   ["library", "book place"],
+  ["you're welcome", "welcome", "congratulations", "glad"],
+  ["this", "here", "this one"],
+  ["that", "there", "that one"],
   // Thai-specific
   ["not spicy", "no spice", "mild"],
   ["check please", "bill please", "check", "bill"],
