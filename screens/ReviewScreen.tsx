@@ -253,23 +253,36 @@ export default function ReviewScreen({ words, pack, onComplete }: ReviewScreenPr
         ) : (
           <form onSubmit={e => { e.preventDefault(); e.stopPropagation(); handleReveal(); }} onClick={e => e.stopPropagation()} style={{ textAlign: "center", width: "100%" }}>
             <div style={{ fontSize: 10, fontWeight: 600, color: C.muted, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 10 }}>🇬🇧 Your answer</div>
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder="type translation..."
-              value={userAnswer}
-              onChange={e => { setUserAnswer(e.target.value); setShowHint(false); }}
-              autoFocus
-              autoComplete="off"
-              autoCapitalize="off"
-              style={{
-                width: "80%", padding: "8px 14px", borderRadius: 8,
-                border: `1.5px solid ${C.border}`, background: C.bgDeep,
-                fontSize: 20, fontWeight: 400, fontFamily: FONT_SERIF,
-                color: C.ink, caretColor: C.accent, textAlign: "center",
-                outline: "none",
-              }}
-            />
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%" }}>
+              <input
+                ref={inputRef}
+                type="text"
+                placeholder="type translation..."
+                value={userAnswer}
+                onChange={e => { setUserAnswer(e.target.value); setShowHint(false); }}
+                autoFocus
+                autoComplete="off"
+                autoCapitalize="off"
+                style={{
+                  flex: 1, maxWidth: "75%", padding: "8px 14px", borderRadius: 8,
+                  border: `1.5px solid ${C.border}`, background: C.bgDeep,
+                  fontSize: 20, fontWeight: 400, fontFamily: FONT_SERIF,
+                  color: C.ink, caretColor: C.accent, textAlign: "center",
+                  outline: "none",
+                }}
+              />
+              <button
+                type="submit"
+                style={{
+                  width: 42, height: 42, borderRadius: "50%",
+                  border: "none", background: C.accent, color: "#fff",
+                  fontSize: 20, fontWeight: 700, cursor: "pointer",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  flexShrink: 0,
+                }}
+                aria-label="Submit answer"
+              >→</button>
+            </div>
           </form>
         )}
         {word.reviewCount > 0 && !retrying && (

@@ -134,7 +134,7 @@ export const SEED_WORDS_TH: [string, string, string][] = [
   ["กลางคืน", "glaang-keun", "night"],
 
   // ── People & Pronouns ──────────────────────────────
-  ["ผม", "pŏm", "I (male)"],
+  ["ผม", "pŏm", "hair / I (male)"],
   ["ฉัน", "chǎn", "I (female)"],
   ["คุณ", "kun", "you"],
   ["เขา", "kǎo", "he / she / they"],
