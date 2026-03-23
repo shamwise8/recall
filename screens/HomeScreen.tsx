@@ -76,7 +76,7 @@ export default function HomeScreen({ stats, pack, onSwitchPack, onStartReview, o
             fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: FONT,
             boxShadow: "0 4px 16px rgba(196,89,42,0.35)",
           }}>
-            Play →
+            Play Recall →
           </button>
         )}
       </div>
