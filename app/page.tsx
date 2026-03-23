@@ -20,14 +20,16 @@ export default function Recall() {
   const [stats, setStats] = useState<Stats>({ total: 0, due: 0, learned: 0, reviewedToday: 0, streak: 0 });
   const [dueWords, setDueWords] = useState<Word[]>([]);
   const [sessionResults, setSessionResults] = useState<ReviewResult[]>([]);
-  const [seeding, setSeeding] = useState(false);
 
   const refreshStats = useCallback(async () => { setStats(await getStats()); }, []);
   const refreshDue = useCallback(async () => { setDueWords(await getDueWords(20)); }, []);
 
-  useEffect(() => { (async () => { await refreshStats(); await refreshDue(); setScreen("home"); })(); }, [refreshStats, refreshDue]);
+  useEffect(() => { (async () => {
+    const s = await getStats();
+    if (s.total === 0) await seedWords();
+    await refreshStats(); await refreshDue(); setScreen("home");
+  })(); }, [refreshStats, refreshDue]);
 
-  const handleSeed = async () => { setSeeding(true); await seedWords(); await refreshStats(); await refreshDue(); setSeeding(false); };
   const handleStartReview = async () => { const due = await getDueWords(20); if (due.length === 0) return; setDueWords(due); setScreen("review"); };
   const handleComplete = async (results: ReviewResult[]) => { setSessionResults(results); await refreshStats(); setScreen("complete"); };
   const handlePostScore = (name: string, accuracy: number, wordsReviewed: number, correct: number, feeling: string) => { postScore(name, accuracy, wordsReviewed, correct, feeling); };
@@ -45,7 +47,7 @@ export default function Recall() {
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg, fontFamily: FONT, WebkitFontSmoothing: "antialiased" }}>
-      {screen === "home" && <HomeScreen stats={stats} onStartReview={handleStartReview} onSeed={handleSeed} seeding={seeding} onLeaderboard={() => setScreen("leaderboard")} />}
+      {screen === "home" && <HomeScreen stats={stats} onStartReview={handleStartReview} onLeaderboard={() => setScreen("leaderboard")} />}
       {screen === "review" && <ReviewScreen words={dueWords} onComplete={handleComplete} />}
       {screen === "complete" && <CompleteScreen results={sessionResults} stats={stats} onHome={handleHome} onPostScore={handlePostScore} onLeaderboard={() => setScreen("leaderboard")} />}
       {screen === "leaderboard" && <LeaderboardScreen onBack={handleHome} />}

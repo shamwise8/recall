@@ -1,20 +1,16 @@
 "use client";
 
 import { C, FONT, FONT_SERIF } from "@/styles/theme";
-import { SEED_WORDS } from "@/lib/seed-words";
 import type { Stats } from "@/lib/stats";
 import StreakFire from "@/components/StreakFire";
 
 interface HomeScreenProps {
   stats: Stats;
   onStartReview: () => void;
-  onSeed: () => void;
-  seeding: boolean;
   onLeaderboard: () => void;
 }
 
-export default function HomeScreen({ stats, onStartReview, onSeed, seeding, onLeaderboard }: HomeScreenProps) {
-  const hasWords = stats.total > 0;
+export default function HomeScreen({ stats, onStartReview, onLeaderboard }: HomeScreenProps) {
   const hasDue = stats.due > 0;
 
   return (
@@ -76,18 +72,7 @@ export default function HomeScreen({ stats, onStartReview, onSeed, seeding, onLe
         ))}
       </div>
 
-      {!hasWords && (
-        <button onClick={onSeed} disabled={seeding} style={{
-          width: "100%", padding: "14px", borderRadius: 10,
-          background: C.dark, border: "none", color: "#F8F5EE",
-          fontSize: 14, fontWeight: 600, cursor: seeding ? "default" : "pointer",
-          fontFamily: FONT, opacity: seeding ? 0.6 : 1,
-        }}>
-          {seeding ? "Loading words..." : `Load ${SEED_WORDS.length} Common Words`}
-        </button>
-      )}
-
-      {hasWords && !hasDue && (
+      {!hasDue && (
         <div style={{ textAlign: "center", color: C.ink3, fontSize: 13, lineHeight: 1.6, fontStyle: "italic", fontFamily: FONT_SERIF }}>
           Come back later — your next<br/>reviews will be ready soon.
         </div>
