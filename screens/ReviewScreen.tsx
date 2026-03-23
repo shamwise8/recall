@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { C, FONT, FONT_SERIF } from "@/styles/theme";
 import { scheduleReview, type Word } from "@/lib/srs";
 import { putWord } from "@/lib/db";
+import { isAnswerCorrect } from "@/lib/synonyms";
 import ProgressBar from "@/components/ProgressBar";
 import GradeButton from "@/components/GradeButton";
 
@@ -15,12 +16,18 @@ export interface ReviewResult {
   isCorrect: boolean | null;
 }
 
+const PACK_LABEL: Record<string, { flag: string; name: string }> = {
+  es: { flag: "🇪🇸", name: "SPANISH" },
+  th: { flag: "🇹🇭", name: "THAI" },
+};
+
 interface ReviewScreenProps {
   words: Word[];
+  pack: string;
   onComplete: (results: ReviewResult[]) => void;
 }
 
-export default function ReviewScreen({ words, onComplete }: ReviewScreenProps) {
+export default function ReviewScreen({ words, pack, onComplete }: ReviewScreenProps) {
   const [idx, setIdx] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [results, setResults] = useState<ReviewResult[]>([]);
@@ -61,8 +68,9 @@ export default function ReviewScreen({ words, onComplete }: ReviewScreenProps) {
     // Read directly from DOM — React state may be stale in same event tick
     const rawInput = inputRef.current?.value ?? "";
     const typed = normalize(rawInput);
-    const correct = normalize(words[idx].english);
-    console.log("[RECALL] handleReveal:", { rawInput, typed, correct, match: typed === correct, idx });
+    const correct = normalize(words[idx].answer);
+    const isCorrect = isAnswerCorrect(rawInput, words[idx].answer);
+    console.log("[RECALL] handleReveal:", { rawInput, typed, correct, isCorrect, idx });
     // Must type an answer — don't reveal if blank
     if (typed.length === 0) {
       inputRef.current?.focus();
@@ -74,7 +82,7 @@ export default function ReviewScreen({ words, onComplete }: ReviewScreenProps) {
     setShowHint(false);
     if (typed.length > 0) {
       setAutoGrading(true);
-      if (typed === correct) {
+      if (isCorrect) {
         // Correct — auto-grade and advance after 1s
         setTimeout(() => handleGradeRef.current("good"), 1000);
       } else {
@@ -82,7 +90,7 @@ export default function ReviewScreen({ words, onComplete }: ReviewScreenProps) {
         const currentWord = words[idx];
         const updated = scheduleReview(currentWord, "again");
         putWord(updated);
-        const newResults = [...resultsRef.current, { word: currentWord.spanish, typed: rawInput, correct: currentWord.english, grade: "again", isCorrect: false }];
+        const newResults = [...resultsRef.current, { word: currentWord.prompt, typed: rawInput, correct: currentWord.answer, grade: "again", isCorrect: false }];
         setResults(newResults);
         resultsRef.current = newResults;
         setAnimDir("wrong");
@@ -125,7 +133,7 @@ export default function ReviewScreen({ words, onComplete }: ReviewScreenProps) {
         const updated = scheduleReview(currentWord, "again");
         putWord(updated);
         const typedVal = inputRef.current?.value ?? "";
-        const newResults = [...resultsRef.current, { word: currentWord.spanish, typed: typedVal, correct: currentWord.english, grade: "again", isCorrect: false }];
+        const newResults = [...resultsRef.current, { word: currentWord.prompt, typed: typedVal, correct: currentWord.answer, grade: "again", isCorrect: false }];
         setResults(newResults);
       }
       setAnimDir("wrong");
@@ -144,7 +152,7 @@ export default function ReviewScreen({ words, onComplete }: ReviewScreenProps) {
       putWord(updated);
       const isCorrect = grade !== "again";
       const typedVal = inputRef.current?.value ?? userAnswer;
-      const newResults = [...resultsRef.current, { word: currentWord.spanish, typed: typedVal, correct: currentWord.english, grade, isCorrect }];
+      const newResults = [...resultsRef.current, { word: currentWord.prompt, typed: typedVal, correct: currentWord.answer, grade, isCorrect }];
       setResults(newResults);
       setAnimDir(isCorrect ? "correct" : "wrong");
     } else {
@@ -220,8 +228,11 @@ export default function ReviewScreen({ words, onComplete }: ReviewScreenProps) {
         gap: 20, userSelect: "none", position: "relative",
       }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 10, fontWeight: 600, color: C.muted, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 10 }}>🇪🇸 Spanish</div>
-          <div style={{ fontSize: 32, fontWeight: 400, color: C.ink, fontFamily: FONT_SERIF, lineHeight: 1.15 }}>{word.spanish}</div>
+          <div style={{ fontSize: 10, fontWeight: 600, color: C.muted, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 10 }}>{(PACK_LABEL[pack] || PACK_LABEL.es).flag} {(PACK_LABEL[pack] || PACK_LABEL.es).name}</div>
+          <div style={{ fontSize: 32, fontWeight: 400, color: C.ink, fontFamily: FONT_SERIF, lineHeight: 1.15 }}>{word.prompt}</div>
+          {word.romanized && (
+            <div style={{ fontSize: 14, fontWeight: 400, color: C.ink3, fontFamily: FONT, marginTop: 6, fontStyle: "italic" }}>{word.romanized}</div>
+          )}
         </div>
         <div style={{ width: 48, height: 1, background: C.border }} />
         {revealed ? (
@@ -231,13 +242,13 @@ export default function ReviewScreen({ words, onComplete }: ReviewScreenProps) {
                 {userAnswer}
               </div>
             )}
-            {!waitingAfterWrong && userAnswer.trim() && normalize(userAnswer) === normalize(word.english) && (
+            {!waitingAfterWrong && userAnswer.trim() && isAnswerCorrect(userAnswer, word.answer) && (
               <div style={{ fontSize: 14, fontWeight: 500, color: C.good, fontFamily: FONT_SERIF, marginBottom: 12 }}>
                 ✓ correct
               </div>
             )}
             <div style={{ fontSize: 10, fontWeight: 600, color: C.muted, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 10 }}>🇬🇧 English</div>
-            <div style={{ fontSize: 28, fontWeight: 400, color: waitingAfterWrong ? C.good : C.accent, fontFamily: FONT_SERIF }}>{word.english}</div>
+            <div style={{ fontSize: 28, fontWeight: 400, color: waitingAfterWrong ? C.good : C.accent, fontFamily: FONT_SERIF }}>{word.answer}</div>
           </div>
         ) : (
           <form onSubmit={e => { e.preventDefault(); e.stopPropagation(); handleReveal(); }} onClick={e => e.stopPropagation()} style={{ textAlign: "center", width: "100%" }}>

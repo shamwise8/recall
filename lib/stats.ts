@@ -8,8 +8,8 @@ export interface Stats {
   streak: number;
 }
 
-export async function getStats(): Promise<Stats> {
-  const all = await getAllWords();
+export async function getStats(pack: string): Promise<Stats> {
+  const all = await getAllWords(pack);
   const now = Date.now();
   const today = new Date();
   today.setHours(0, 0, 0, 0);

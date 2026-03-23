@@ -1,4 +1,4 @@
-export const SEED_WORDS: [string, string][] = [
+export const SEED_WORDS_ES: [string, string][] = [
   ["hola","hello"],["adiós","goodbye"],["gracias","thank you"],["por favor","please"],
   ["sí","yes"],["no","no"],["buenos días","good morning"],["buenas noches","good night"],
   ["¿cómo estás?","how are you?"],["bien","good"],["mal","bad"],["agua","water"],

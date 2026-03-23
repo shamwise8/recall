@@ -14,26 +14,45 @@ import CompleteScreen from "@/screens/CompleteScreen";
 import LeaderboardScreen from "@/screens/LeaderboardScreen";
 
 type Screen = "loading" | "home" | "review" | "complete" | "leaderboard";
+type Pack = "es" | "th";
 
 export default function Recall() {
   const [screen, setScreen] = useState<Screen>("loading");
+  const [pack, setPack] = useState<Pack>("th");
   const [stats, setStats] = useState<Stats>({ total: 0, due: 0, learned: 0, reviewedToday: 0, streak: 0 });
   const [dueWords, setDueWords] = useState<Word[]>([]);
   const [sessionResults, setSessionResults] = useState<ReviewResult[]>([]);
 
-  const refreshStats = useCallback(async () => { setStats(await getStats()); }, []);
-  const refreshDue = useCallback(async () => { setDueWords(await getDueWords(20)); }, []);
+  // Read saved pack preference on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("recall-pack") as Pack | null;
+    if (saved === "es" || saved === "th") setPack(saved);
+  }, []);
 
-  useEffect(() => { (async () => {
-    const s = await getStats();
-    if (s.total === 0) await seedWords();
-    await refreshStats(); await refreshDue(); setScreen("home");
-  })(); }, [refreshStats, refreshDue]);
+  const refreshStats = useCallback(async (p: Pack) => { setStats(await getStats(p)); }, []);
+  const refreshDue = useCallback(async (p: Pack) => { setDueWords(await getDueWords(p, 20)); }, []);
 
-  const handleStartReview = async () => { const due = await getDueWords(20); if (due.length === 0) return; setDueWords(due); setScreen("review"); };
-  const handleComplete = async (results: ReviewResult[]) => { setSessionResults(results); await refreshStats(); setScreen("complete"); };
+  // Load data when pack changes
+  useEffect(() => {
+    (async () => {
+      setScreen("loading");
+      const s = await getStats(pack);
+      if (s.total === 0) await seedWords(pack);
+      await refreshStats(pack);
+      await refreshDue(pack);
+      setScreen("home");
+    })();
+  }, [pack, refreshStats, refreshDue]);
+
+  const handleSwitchPack = (p: Pack) => {
+    localStorage.setItem("recall-pack", p);
+    setPack(p);
+  };
+
+  const handleStartReview = async () => { const due = await getDueWords(pack, 20); if (due.length === 0) return; setDueWords(due); setScreen("review"); };
+  const handleComplete = async (results: ReviewResult[]) => { setSessionResults(results); await refreshStats(pack); setScreen("complete"); };
   const handlePostScore = (name: string, accuracy: number, wordsReviewed: number, correct: number, feeling: string) => { postScore(name, accuracy, wordsReviewed, correct, feeling); };
-  const handleHome = async () => { await refreshStats(); await refreshDue(); setScreen("home"); };
+  const handleHome = async () => { await refreshStats(pack); await refreshDue(pack); setScreen("home"); };
 
   if (screen === "loading") {
     return (
@@ -47,8 +66,8 @@ export default function Recall() {
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg, fontFamily: FONT, WebkitFontSmoothing: "antialiased" }}>
-      {screen === "home" && <HomeScreen stats={stats} onStartReview={handleStartReview} onLeaderboard={() => setScreen("leaderboard")} />}
-      {screen === "review" && <ReviewScreen words={dueWords} onComplete={handleComplete} />}
+      {screen === "home" && <HomeScreen stats={stats} pack={pack} onSwitchPack={handleSwitchPack} onStartReview={handleStartReview} onLeaderboard={() => setScreen("leaderboard")} />}
+      {screen === "review" && <ReviewScreen words={dueWords} pack={pack} onComplete={handleComplete} />}
       {screen === "complete" && <CompleteScreen results={sessionResults} stats={stats} onHome={handleHome} onPostScore={handlePostScore} onLeaderboard={() => setScreen("leaderboard")} />}
       {screen === "leaderboard" && <LeaderboardScreen onBack={handleHome} />}
     </div>

@@ -4,21 +4,29 @@ import { C, FONT, FONT_SERIF } from "@/styles/theme";
 import type { Stats } from "@/lib/stats";
 import StreakFire from "@/components/StreakFire";
 
+const PACK_INFO: Record<string, { flag: string; label: string; sub: string }> = {
+  es: { flag: "🇪🇸", label: "Spanish", sub: "Spanish vocabulary" },
+  th: { flag: "🇹🇭", label: "Thai", sub: "Thai vocabulary" },
+};
+
 interface HomeScreenProps {
   stats: Stats;
+  pack: string;
+  onSwitchPack: (pack: "es" | "th") => void;
   onStartReview: () => void;
   onLeaderboard: () => void;
 }
 
-export default function HomeScreen({ stats, onStartReview, onLeaderboard }: HomeScreenProps) {
+export default function HomeScreen({ stats, pack, onSwitchPack, onStartReview, onLeaderboard }: HomeScreenProps) {
   const hasDue = stats.due > 0;
+  const info = PACK_INFO[pack] || PACK_INFO.es;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 22, padding: "32px 20px", maxWidth: 420, margin: "0 auto", width: "100%" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
         <div>
           <h1 style={{ fontSize: 26, fontWeight: 400, color: C.ink, margin: 0, fontFamily: FONT_SERIF, letterSpacing: "-0.02em" }}>Recall</h1>
-          <p style={{ fontSize: 12, color: C.muted, margin: "2px 0 0", letterSpacing: "0.06em" }}>Spanish vocabulary</p>
+          <p style={{ fontSize: 12, color: C.muted, margin: "2px 0 0", letterSpacing: "0.06em" }}>{info.sub}</p>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <StreakFire count={stats.streak} />
@@ -30,6 +38,22 @@ export default function HomeScreen({ stats, onStartReview, onLeaderboard }: Home
             🏆 Board
           </button>
         </div>
+      </div>
+
+      {/* Pack switcher */}
+      <div style={{ display: "flex", width: "100%", background: C.bgDeep, borderRadius: 10, padding: 3 }}>
+        {(["es", "th"] as const).map(p => (
+          <button key={p} onClick={() => onSwitchPack(p)} style={{
+            flex: 1, padding: "9px", borderRadius: 8, border: "none",
+            background: pack === p ? C.card : "transparent",
+            color: pack === p ? C.ink : C.ink3,
+            fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: FONT,
+            boxShadow: pack === p ? C.shadow : "none", transition: "all 0.2s",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+          }}>
+            {PACK_INFO[p].flag} {PACK_INFO[p].label}
+          </button>
+        ))}
       </div>
 
       <div style={{

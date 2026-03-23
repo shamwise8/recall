@@ -1,7 +1,9 @@
 export interface Word {
   id: string;
-  spanish: string;
-  english: string;
+  prompt: string;
+  answer: string;
+  romanized?: string;
+  pack: string;
   reps: number;
   lapses: number;
   ease: number;
@@ -10,6 +12,9 @@ export interface Word {
   lastReviewed: number | null;
   reviewCount: number;
   createdAt: number;
+  // Legacy compat
+  spanish?: string;
+  english?: string;
 }
 
 export type Grade = "again" | "hard" | "good" | "easy";
@@ -27,11 +32,13 @@ export function scheduleReview(word: Word, grade: Grade): Word {
   return { ...word, reps, lapses, ease: Math.round(ease * 100) / 100, interval: Math.round(interval), due: now + Math.round(interval), lastReviewed: now, reviewCount: (word.reviewCount || 0) + 1 };
 }
 
-export function createWord(spanish: string, english: string): Word {
+export function createWord(prompt: string, answer: string, pack: string, romanized?: string): Word {
   return {
-    id: `${spanish.toLowerCase().trim()}_${english.toLowerCase().trim()}_${Date.now()}`,
-    spanish: spanish.trim(),
-    english: english.trim(),
+    id: `${pack}_${prompt.toLowerCase().trim()}_${answer.toLowerCase().trim()}_${Date.now()}`,
+    prompt: prompt.trim(),
+    answer: answer.trim(),
+    romanized: romanized?.trim(),
+    pack,
     reps: 0,
     lapses: 0,
     ease: 2.5,
