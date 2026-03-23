@@ -43,7 +43,7 @@ export default function HomeScreen({ stats, onStartReview, onLeaderboard }: Home
           {hasDue ? stats.due : "✓"}
         </div>
         <div style={{ fontSize: 14, fontWeight: 400, marginTop: 6, opacity: 0.75, fontFamily: FONT_SERIF, fontStyle: "italic" }}>
-          {hasDue ? "words ready to review" : hasWords ? "all caught up" : "no words yet"}
+          {hasDue ? "words ready to review" : "all caught up"}
         </div>
         {hasDue && (
           <button onClick={onStartReview} style={{
