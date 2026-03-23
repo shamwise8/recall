@@ -11,7 +11,7 @@ interface LeaderboardScreenProps {
 }
 
 export default function LeaderboardScreen({ onBack }: LeaderboardScreenProps) {
-  const [tab, setTab] = useState("week");
+  const [tab, setTab] = useState("alltime");
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
