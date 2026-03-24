@@ -260,7 +260,6 @@ export default function ReviewScreen({ words, pack, onComplete }: ReviewScreenPr
                 placeholder="type translation..."
                 value={userAnswer}
                 onChange={e => { setUserAnswer(e.target.value); setShowHint(false); }}
-                onFocus={() => { setTimeout(() => window.scrollTo({ top: 0 }), 100); }}
                 autoFocus
                 autoComplete="off"
                 autoCapitalize="off"
